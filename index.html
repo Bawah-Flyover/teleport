@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Bawah Flyover Teleporter</title>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+    // Your Firebase config here — replace with your own
+        const firebaseConfig = {
+            apiKey: "AIzaSyA1GAbMkSoj8BDVCB_nltH0u7m3iWPbr8I",
+            authDomain: "teleport-f5281.firebaseapp.com",
+            projectId: "teleport-f5281",
+            storageBucket: "teleport-f5281.firebasestorage.app",
+            messagingSenderId: "259123459988",
+            appId: "1:259123459988:web:ef8159159ea26b228cc181",
+            measurementId: "G-F7ZML556XK"
+        };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    async function redirectToUrl(shortCode) {
+      if (!shortCode) {
+        document.getElementById("status").textContent = "No short code provided in URL.";
+        return;
+      }
+
+      try {
+        const docRef = doc(db, "links", shortCode);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          const url = data.url;
+          if (url) {
+            window.location.href = url;  // Redirect
+          } else {
+            document.getElementById("status").textContent = "URL not found for this code.";
+          }
+        } else {
+          document.getElementById("status").textContent = "Short code not found.";
+        }
+      } catch (error) {
+        document.getElementById("status").textContent = "Error fetching link: " + error.message;
+      }
+    }
+
+    // Run when page loads
+    window.addEventListener("DOMContentLoaded", () => {
+      // Get short code from URL hash (after #)
+      const shortCode = window.location.hash.substring(1);
+      redirectToUrl(shortCode);
+    });
+  </script>
+</head>
+<body>
+  <h1>Please wait</h1>
+  <p id="status">Loading...</p>
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Submit New Link</title>
+</head>
+<body>
+  <h2>Add a New Short Link</h2>
+
+  <form id="linkForm">
+    <input type="text" id="shortCode" placeholder="Short code" required />
+    <input type="url" id="url" placeholder="Destination URL" required />
+    <button type="submit">Add Link</button>
+  </form>
+
+  <p id="msg"></p>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyA1GAbMkSoj8BDVCB_nltH0u7m3iWPbr8I",
+            authDomain: "teleport-f5281.firebaseapp.com",
+            projectId: "teleport-f5281",
+            storageBucket: "teleport-f5281.firebasestorage.app",
+            messagingSenderId: "259123459988",
+            appId: "1:259123459988:web:ef8159159ea26b228cc181",
+            measurementId: "G-F7ZML556XK"
+        };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Expose to console for debugging
+    window.db = db;
+
+    const form = document.getElementById("linkForm");
+    const msg = document.getElementById("msg");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault(); // Prevent reload
+
+      const shortCode = document.getElementById("shortCode").value.trim();
+      const url = document.getElementById("url").value.trim();
+
+      if (!shortCode || !url) {
+        msg.textContent = "Please fill both fields.";
+        return;
+      }
+
+      try {
+        await setDoc(doc(db, "links", shortCode), { url: url });
+        msg.textContent = `✅ Link saved: ${shortCode} → ${url}`;
+        form.reset();
+      } catch (error) {
+        msg.textContent = "❌ Error: " + error.message;
+        console.error(error);
+      }
+    });
+  </script>
+</body>
+</html>
